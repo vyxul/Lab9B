@@ -2,6 +2,7 @@ package com.example.steven.makeacall;
 
 import android.content.ContentResolver;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -15,7 +16,7 @@ import org.w3c.dom.Text;
 public class MainActivity extends AppCompatActivity {
     
     TextView result;
-    EditText FName, LName;
+    EditText FirstName, LastName;
 
     private static final String FIRST_NAME = "FirstName";
     private static final String LAST_NAME = "LastName";
@@ -27,20 +28,27 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         
         result = findViewById(R.id.Result);
-        FName = findViewById(R.id.FirstName);
-        LName = findViewById(R.id.LastName);
-
-        String AUTHORITY = "com.example.st1013838.phonebook.MyContentProvider";
-        String TABLE_ITEM = "Contacts";
-        Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + TABLE_ITEM);
-        ContentResolver contentResolver = getContentResolver();
-        String projection[] = {FIRST_NAME, LAST_NAME, PHONE_NUMBER};
-        Cursor cursor = contentResolver.query(CONTENT_URI, projection, null, null, null);
-
+        FirstName = findViewById(R.id.FirstName);
+        LastName = findViewById(R.id.LastName);
     }
     
     public void FindButton (View view){
-        Toast.makeText(this, "Find Button is not implemented yet.", Toast.LENGTH_SHORT).show();
+        String FName = FirstName.getText().toString();
+        String LName = LastName.getText().toString();
+
+        String AUTHORITY = "com.example.st1013838.phonebook.MyContentProvider";
+        String TABLE_ITEM = "Contacts";
+        String projection[] = {FIRST_NAME, LAST_NAME, PHONE_NUMBER};
+        Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/" + TABLE_ITEM);
+        ContentResolver contentResolver = getContentResolver();
+        Cursor cursor = contentResolver.query(CONTENT_URI, projection, "FirstName = ? AND LastName = ?", new String[]{FName, LName}, null);
+
+
+        if (!cursor.moveToFirst())
+            result.setText(FName + " " + LName + " not found.");
+
+        else
+            result.setText(cursor.getString(2));
     }
     
     public void CallButton (View view){
